@@ -1,9 +1,10 @@
 import json
+import os
 import pandas as pd
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.responses import RedirectResponse, HTMLResponse
 
-from .engine import lookup, lookup_india
+from .engine import lookup, lookup_india, update, update_india
 from .charts import chart
 from .config import CACHE, INDIA_CACHE
 
@@ -25,6 +26,26 @@ app = FastAPI(
 def ui():
     """Interactive RS Rating dashboard."""
     return HTMLResponse(_UI_HTML)
+
+
+# ── Admin update endpoint ─────────────────────────────────────────────────────
+
+@app.post("/admin/update", summary="🔄 Rebuild both benchmarks (requires secret token)")
+def admin_update(x_update_token: str = Header(None)):
+    """
+    Rebuild the US (S&P 500) and India (Nifty 750) benchmarks.
+    Requires the X-Update-Token header to match the UPDATE_SECRET env var.
+    Called daily by GitHub Actions.
+    """
+    secret = os.environ.get("UPDATE_SECRET", "")
+    if not secret or x_update_token != secret:
+        raise HTTPException(status_code=401, detail="Invalid or missing X-Update-Token header.")
+    try:
+        update()
+        update_india()
+        return {"status": "ok", "message": "Both benchmarks rebuilt successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ── Chart endpoint (returns Plotly figure JSON) ───────────────────────────────
