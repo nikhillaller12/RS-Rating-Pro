@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rs-rating-pro"
+version = "0.1.0"
+description = "Relative Strength Rating Engine"
+requires-python = ">=3.10"
+
+dependencies = [
+    "pandas",
+    "numpy",
+    "yfinance",
+    "plotly>=5.0,<6.0",
+    "streamlit>=1.38,<1.42",
+    "fastapi",
+    "uvicorn",
+    "tqdm",
+    "pyarrow",
+    "requests",
+    "lxml"
+]
+
+[project.scripts]
+rs = "rs_rating.cli:main"
+
+[tool.setuptools]
+packages = ["rs_rating"]

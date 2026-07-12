@@ -1,0 +1,11 @@
+pandas
+numpy
+yfinance
+plotly>=5.0,<6.0
+streamlit>=1.38,<1.42
+fastapi
+uvicorn[standard]
+tqdm
+pyarrow
+requests
+lxml
